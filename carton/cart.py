@@ -5,9 +5,11 @@ from carton.module_loading import get_product_model
 
 
 class CartItem(object):
+
     """
     A cart item, with the associated product, its quantity and its price.
     """
+
     def __init__(self, product, quantity, price):
         self.product = product
         self.quantity = int(quantity)
@@ -33,10 +35,11 @@ class CartItem(object):
 
 class Cart(object):
     queryset = None
-    
+
     """
     A cart that lives in the session.
     """
+
     def __init__(self, session, session_key=None, product_model=None):
         self._items_dict = {}
         self.session = session
@@ -88,6 +91,24 @@ class Cart(object):
                 raise ValueError('Missing price when adding to cart')
             self._items_dict[product.pk] = CartItem(product, quantity, price)
         self.update_session()
+
+    def update_quantity(self, product, quantity):
+        """
+        Update the quantity of an existing product.
+        either reduce or increase the quantity.
+        <product>: product id(str || int) or product instance
+        <quantity>: naegative to reduce quantity or positive to increase.
+        """
+        product_model = self.product_model or get_product_model()
+
+        if isinstance(product, product_model):
+            pass
+        elif isinstance(product, int):
+            pass
+        else:
+            raise TypeError(
+                'Expecting <product> to be an int or %s got %s') \
+                % (type(product_model), type(product))
 
     def remove(self, product):
         """
@@ -153,7 +174,6 @@ class Cart(object):
             product_id = str(item.product.pk)
             cart_representation[product_id] = item.to_dict()
         return cart_representation
-
 
     @property
     def items_serializable(self):
